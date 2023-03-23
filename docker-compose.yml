@@ -1,0 +1,36 @@
+version: "3.9"
+
+volumes:
+  node_db_data:
+
+services:
+  node_app:
+    container_name: node-app
+    build: .
+    image: node-app-image
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+    volumes:
+      - .:/usr/app
+    depends_on:
+      - node_db
+  node_db:
+    container_name: node-db
+    image: postgres:12
+    ports:
+      - "${DB_PORT}:5432"
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${DB_DATABASE}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - node_db_data:/var/lib/postgresql/data
